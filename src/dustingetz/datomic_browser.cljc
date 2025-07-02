@@ -25,10 +25,9 @@
 #?(:clj (defn attribute-count [!e] (-> *db-stats* :attrs (get (:db/ident !e)) :count)))
 
 #?(:clj (defn attribute-detail [a]
-          (->> (d/query {:query '[:find [?e ...] :in $ ?a :where [?e ?a]] :args [*db* a],
-                         :io-context ::attribute-detail, :query-stats ::attribute-detail})
-               (dx/query-stats-as-meta)
-               (hf-nav/navigable (fn [?e] (d/entity *db* ?e))))))
+          (->> (d/datoms *db* :aevt a)
+            (map :e)
+            (hf-nav/navigable (fn [?e] (d/entity *db* ?e))))))
 
 #?(:clj (defn summarize-attr [db k] (->> (dx/easy-attr db k) (remove nil?) (map name) (str/join " "))))
 #?(:clj (defn summarize-attr* [?!a] (when ?!a (summarize-attr *db* (:db/ident ?!a)))))
@@ -54,14 +53,15 @@
 
 (e/defn ^::e/export SemanticTooltip [?value entity props] ; FIXME props is a custom hyperfiddle deftype
   (e/server
-    (when (qualified-keyword? ?value)
-      (let [attribute (and props (hfql/unwrap props)) ; `and` is glitch guard, TODO remove
-            [typ _ unique?] (dx/easy-attr *db* attribute)]
-        (cond
-          (= :db/id attribute) (EntityTooltip ?value entity attribute)
-          (= :ref typ) (pprint-str (d/pull *db* ['*] ?value))
-          (= :identity unique?) (pprint-str (d/pull *db* ['*] [attribute #_(:db/ident (d/entity db a)) ?value])) ; resolve lookup ref
-          () nil)))))
+    (let [attribute (and props (hfql/unwrap props))] ; `and` is glitch guard, TODO remove
+      (cond (= :db/id attribute) (EntityTooltip ?value entity props)
+            (qualified-keyword? ?value)
+            (let [[typ _ unique?] (dx/easy-attr *db* attribute)]
+              (cond
+                (= :db/id attribute) (EntityTooltip ?value entity props)
+                (= :ref typ) (pprint-str (d/pull *db* ['*] ?value))
+                (= :identity unique?) (pprint-str (d/pull *db* ['*] [attribute #_(:db/ident (d/entity db a)) ?value])) ; resolve lookup ref
+                () nil))))))
 
 (e/defn ^::e/export SummarizeDatomicAttribute [?v row props] ; FIXME props is a custom hyperfiddle deftype
   (e/server
