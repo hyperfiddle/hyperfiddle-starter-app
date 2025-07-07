@@ -1,6 +1,6 @@
 (ns dev
   (:require
-   [dustingetz.hyperfiddle-datomic-browser-demo :refer [hyperfiddle-demo-boot]]
+   [dustingetz.hyperfiddle-demo :refer [hyperfiddle-demo-boot]]
 
    #?(:clj [shadow.cljs.devtools.api :as shadow-cljs-compiler])
    #?(:clj [shadow.cljs.devtools.server :as shadow-cljs-compiler-server])
@@ -13,6 +13,7 @@
    #?(:clj [ring.middleware.content-type :refer [wrap-content-type]])
    #?(:clj [hyperfiddle.electric-ring-adapter3 :refer [wrap-electric-websocket]]) ; jetty 10+
    ;; #?(:clj [hyperfiddle.electric-jetty9-ring-adapter3 :refer [electric-jetty9-ws-install]]) ; jetty9
+   [clojure.spec.alpha]
    ))
 
 (comment (-main)) ; repl entrypoint
@@ -25,6 +26,7 @@
            http-port (or http-port (next-available-port-from 8080))]
        (assert (some? datomic-uri) "Missing `:datomic-uri`. See README.md")
        (assert (string? datomic-uri) "Invalid `:datomic-uri`. See README.md")
+       (clojure.spec.alpha/check-asserts true)
 
        (shadow-cljs-compiler-server/start!)
        (shadow-cljs-compiler/watch :dev)

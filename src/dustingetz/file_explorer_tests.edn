@@ -1,0 +1,58 @@
+(ns dustingetz.file-explorer-tests)
+
+;; putting these tests aside just so we can see how large is the main file
+;; this file won't stay
+;; we'll decide if tests and examples remain in the main file
+
+(tests
+  "get-extension"
+  (get-extension nil) := nil
+  (get-extension "") := nil
+  (get-extension ".") := nil
+  (get-extension "..") := nil
+  (get-extension "image") := nil
+  (get-extension "image.") := nil
+  (get-extension "image..") := nil
+  (get-extension "image.png") := "png"
+  (get-extension "image.blah.png") := "png"
+  (get-extension "image.blah..png") := "png"
+  (get-extension ".gitignore") := nil)
+
+(comment
+  "java.io.File interop"
+  (def h (clojure.java.io/file "src"))
+
+  (sort (.listFiles h))
+
+  (.getName h) := "src"
+  (.getPath h) := "src"
+  (.isDirectory h) := true
+  (.isFile h) := false
+                                        ;(.getParent h) := nil -- ??
+                                        ;(.getParentFile h) := nil -- ??
+  (-> (datafy java.io.File) :members keys)
+  (->> (seq (.listFiles h)) (take 1) first datafy)
+  (for [x (take 5 (.listFiles h))] (.getName x)))
+
+
+(tests
+  (def p (file-path (clojure.java.io/file "src")))
+  (instance? Path p) := true
+  (-> (datafy Path) :members keys)
+  (-> p .getRoot str) := "/"
+  (-> p .getFileName str) := "src"
+  (-> p .getParent .getFileName str) := "electric-fiddle"
+  (-> p .getParent .toFile .getName) := "electric-fiddle"
+  #_(-> p .getParent .toFile datafy))
+
+(tests
+  (def attrs (path-attrs (file-path (clojure.java.io/file "src"))))
+  (instance? BasicFileAttributes attrs) := true
+  (.isDirectory attrs) := true
+  (.isSymbolicLink attrs) := false
+  (.isRegularFile attrs) := false
+  (.isOther attrs) := false)
+
+(tests
+  (file-attrs (clojure.java.io/file "src"))
+  )
