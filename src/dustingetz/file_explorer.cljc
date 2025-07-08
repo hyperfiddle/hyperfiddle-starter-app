@@ -44,6 +44,7 @@
 
 #?(:clj
    (extend-type java.io.File
+     hfql/Identifiable (-identify [^File x] (.getName x))
      hfql/Suggestable
      (hfql/-suggest [_]
        (pull-spec [.getName
