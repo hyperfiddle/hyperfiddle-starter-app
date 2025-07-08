@@ -6,7 +6,6 @@
    [hyperfiddle.electric3 :as e]
    [hyperfiddle.navigator4 :as navigator :refer [HfqlRoot]]
    [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]
-   [hyperfiddle.rcf :refer [tests]]
    #?(:clj [hyperfiddle.hfql0 :as hfql]))
   #?(:clj
      (:import
