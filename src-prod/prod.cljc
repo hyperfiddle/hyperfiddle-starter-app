@@ -1,7 +1,7 @@
 (ns prod
   #?(:cljs (:require-macros [prod :refer [comptime-resource]]))
   (:require
-   [dustingetz.hyperfiddle-datomic-browser-demo :refer [hyperfiddle-demo-boot]]
+   [dustingetz.hyperfiddle-demo :refer [hyperfiddle-demo-boot]]
 
    #?(:clj [ring.adapter.jetty :as ring])
    #?(:clj [ring.util.response :as ring-response])
@@ -20,7 +20,7 @@
 (declare wrap-prod-index-page)
 
 #?(:clj ; server entrypoint
-   (defn -main [& {:strs [datomic-uri http-port] :as args}] ; clojure.main entrypoint, args are strings
+   (defn -main [& {:strs [http-port] :as args}] ; clojure.main entrypoint, args are strings
      (let [config
            ;; Client and server versions must match in prod (dev is not concerned)
            ;; `src-build/build.clj` will compute the common version and store it in `resources/electric-manifest.edn`
@@ -40,7 +40,7 @@
            (wrap-prod-index-page config) ; defined below
            (wrap-resource (:resources-path config))
            (wrap-content-type)
-           (electric-ring/wrap-electric-websocket (fn [ring-request] (hyperfiddle-demo-boot ring-request datomic-uri)))
+           (electric-ring/wrap-electric-websocket (fn [ring-request] (hyperfiddle-demo-boot ring-request)))
            (electric-ring/wrap-reject-stale-client config) ; ensures electric client and servers stays in sync.
            (wrap-params))
          {:host (:host config), :port (:port config), :join? false
