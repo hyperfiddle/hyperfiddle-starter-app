@@ -1,6 +1,7 @@
 (ns dustingetz.hyperfiddle-demo
   (:require
    [dustingetz.file-explorer]
+   [dustingetz.namespace-explorer]
 
    [hyperfiddle.electric3 :as e]
    [hyperfiddle.electric-dom3 :as dom]
@@ -11,8 +12,9 @@
     (binding [dom/node js/document.body
               e/http-request (e/server ring-request)]
       (dom/div (dom/props {:style {:display "contents"}}) ; mandatory wrapper div https://github.com/hyperfiddle/electric/issues/74
-        (Hyperfiddle
-          {`dustingetz.file-explorer/FileExplorer dustingetz.file-explorer/FileExplorer})))))
+               (Hyperfiddle
+                 {`dustingetz.file-explorer/FileExplorer dustingetz.file-explorer/FileExplorer
+                  `dustingetz.namespace-explorer/NamespaceExplorer dustingetz.namespace-explorer/NamespaceExplorer})))))
 
 (defn hyperfiddle-demo-boot [ring-request]
   #?(:clj  (e/boot-server {} InjectAndRunHyperfiddle (e/server ring-request)) ; client/server entrypoints must be symmetric
