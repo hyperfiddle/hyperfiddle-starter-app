@@ -46,6 +46,7 @@
                         file-modified
                         file-size
                         dir-list
+                        .listFiles
                         dir-parent]))))
 
 #?(:clj (def site-map (sitemap
