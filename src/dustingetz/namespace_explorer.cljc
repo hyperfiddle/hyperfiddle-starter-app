@@ -4,7 +4,6 @@
     [hyperfiddle.electric-dom3 :as dom]
     [hyperfiddle.electric3 :as e]
     [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]
-    #?(:clj [hyperfiddle.sitemap :refer [sitemap pull-spec]]) ; TODO merge with hfql0
     [hyperfiddle.navigator4 :refer [HfqlRoot]]))
 
 #?(:clj (defn clojure-all-ns [] (vec (sort-by ns-name (all-ns)))))
@@ -19,13 +18,13 @@
 
 #?(:clj (extend-type clojure.lang.Var
           hfql/Identifiable (-identify [x] (symbol x))
-          hfql/Suggestable (-suggest [_] (pull-spec [.toSymbol meta .getTag .isMacro]))))
+          hfql/Suggestable (-suggest [_] (hfql/pull-spec [.toSymbol meta .getTag .isMacro]))))
 
 #?(:clj (extend-type clojure.lang.Namespace
           hfql/Identifiable (-identify [^clojure.lang.Namespace ns] (ns-name ns))))
 
 #?(:clj (def site-map
-          (sitemap
+          (hfql/sitemap
             {clojure-all-ns (hfql/props [ns-name ns-doc]
                               {::hfql/select (find-ns %)})
              find-ns [ns-name

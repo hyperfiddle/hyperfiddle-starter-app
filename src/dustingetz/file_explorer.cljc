@@ -3,7 +3,6 @@
                    [java.nio.file.attribute BasicFileAttributes FileTime]
                    [java.io File]))
   (:require
-    #?(:clj [hyperfiddle.sitemap :refer [sitemap pull-spec]])
     #?(:clj clojure.java.io)
     [hyperfiddle.electric-dom3 :as dom]
     [hyperfiddle.electric3 :as e]
@@ -39,17 +38,17 @@
 #?(:clj (extend-type java.io.File
           hfql/Identifiable (-identify [^File x] (.getName x))
           hfql/Suggestable
-          (hfql/-suggest [_]
-            (pull-spec [.getName
-                        (hfql/props {file-kind name}
-                          {::hfql/label file-kind})
-                        file-modified
-                        file-size
-                        dir-list
-                        .listFiles
-                        dir-parent]))))
+          (-suggest [_]
+            (hfql/pull-spec [.getName
+                             (hfql/props {file-kind name}
+                               {::hfql/label file-kind})
+                             file-modified
+                             file-size
+                             dir-list
+                             .listFiles
+                             dir-parent]))))
 
-#?(:clj (def site-map (sitemap
+#?(:clj (def site-map (hfql/sitemap
                         {clojure.java.io/file []})))
 
 (e/defn FileExplorer []
