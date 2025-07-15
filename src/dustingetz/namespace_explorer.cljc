@@ -10,7 +10,7 @@
 #?(:clj (defn doc [!x] (-> !x meta :doc)))
 #?(:clj (defn ns-publics2 [$ns] (-> $ns ns-publics vals)))
 #?(:clj (defn ns-publics-count [!ns] (count (ns-publics !ns))))
-#?(:clj (defn var-arglists [!var] (->> !var meta :arglists vec str)))
+#?(:clj (defn var-arglists [!var] (->> !var meta :arglists str)))
 #?(:clj (defn var-name [!var] (-> !var symbol name symbol)))
 
 #?(:clj (extend-type clojure.lang.Var
