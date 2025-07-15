@@ -44,7 +44,7 @@
                .getAbsolutePath
                .lastModified
                .listFiles
-               (hfql/props {file-kind name} {::hfql/label file-kind})
+               {file-kind name}
                file-modified
                file-size]))))
 
