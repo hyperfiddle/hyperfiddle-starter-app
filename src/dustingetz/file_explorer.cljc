@@ -10,7 +10,7 @@
     [hyperfiddle.navigator4 :refer [HfqlRoot]]))
 
 ;#?(:clj (defn file-order-compare [^File x] [(not (.isDirectory x)) (.getName x)]))
-#?(:clj (defn dir-list [^File x] (.listFiles x)))
+#?(:clj (defn dir-list [^String file-path] (.listFiles (clojure.java.io/file file-path))))
 #?(:clj (defn path-attrs [^Path p] (Files/readAttributes p BasicFileAttributes (make-array java.nio.file.LinkOption 0))))
 #?(:clj (defn file-path "get java.nio.file.Path of j.n.f.File" [^java.io.File f]
           (-> f .getAbsolutePath (java.nio.file.Paths/get (make-array String 0)))))
