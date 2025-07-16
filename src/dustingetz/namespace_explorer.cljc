@@ -6,7 +6,7 @@
        :cljs [hyperfiddle.hfql0 :as-alias hfql])
     [hyperfiddle.navigator4 :refer [HfqlRoot]]))
 
-#?(:clj (defn clojure-all-ns [] (vec (sort-by ns-name (all-ns)))))
+#?(:clj (defn clojure-all-ns "List all clojure (jvm) namespaces" [] (vec (sort-by ns-name (all-ns)))))
 #?(:clj (defn doc [!x] (-> !x meta :doc)))
 #?(:clj (defn ns-publics2 [$ns] (-> $ns ns-publics vals)))
 #?(:clj (defn ns-publics-count [!ns] (count (ns-publics !ns))))
