@@ -1,10 +1,7 @@
 (ns dustingetz.namespace-explorer
   (:require
-    [hyperfiddle.electric3 :as e]
-    [hyperfiddle.electric-dom3 :as dom]
     #?(:clj [hyperfiddle.hfql0 :as hfql :refer [Identifiable Suggestable]]
-       :cljs [hyperfiddle.hfql0 :as-alias hfql])
-    [hyperfiddle.navigator4 :refer [HfqlRoot]]))
+       :cljs [hyperfiddle.hfql0 :as-alias hfql])))
 
 #?(:clj (defn clojure-all-ns "List all clojure (jvm) namespaces" [] (vec (sort-by ns-name (all-ns)))))
 #?(:clj (defn doc [!x] (-> !x meta :doc)))
@@ -27,8 +24,3 @@
           (hfql/sitemap
             {clojure-all-ns (hfql/props [ns-name ns-publics-count doc] {::hfql/select (ns-publics2 %)})
              ns-publics2 [var-name var-arglists doc type]})))
-
-(e/defn NamespaceExplorer []
-  (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
-  (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
-  (HfqlRoot site-map `[(clojure-all-ns)]))
