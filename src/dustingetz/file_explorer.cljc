@@ -4,12 +4,9 @@
                    [java.io File]))
   (:require
     #?(:clj clojure.java.io)
-    [hyperfiddle.electric3 :as e]
-    [hyperfiddle.electric-dom3 :as dom]
-    [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]
-    [hyperfiddle.navigator4 :refer [HfqlRoot]]))
+    [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]))
 
-;#?(:clj (defn file-order-compare [^File x] [(not (.isDirectory x)) (.getName x)]))
+#?(:clj (defn file-order-compare [^File x] [(not (.isDirectory x)) (.getName x)]))
 #?(:clj (defn dir-list [^String file-path] (.listFiles (clojure.java.io/file file-path))))
 #?(:clj (defn path-attrs [^Path p] (Files/readAttributes p BasicFileAttributes (make-array java.nio.file.LinkOption 0))))
 #?(:clj (defn file-path "get java.nio.file.Path of j.n.f.File" [^java.io.File f]
@@ -50,12 +47,5 @@
 
 #?(:clj (def site-map
           (hfql/sitemap
-            {clojure.java.io/file [.getName .listFiles #_(hfql/props .listFiles {::hfql/select (dir-list %)})]
-             #_#_dir-list [.getName]})))
-
-(e/defn FileExplorer []
-  (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
-  (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
-  (HfqlRoot site-map '[(clojure.java.io/file ".")]))
-
-(comment (hfql/suggest-java-class-members (clojure.java.io/file ".")))
+            {clojure.java.io/file []
+             dir-list (hfql/props [] {::hfql/select (dir-list %)})})))
