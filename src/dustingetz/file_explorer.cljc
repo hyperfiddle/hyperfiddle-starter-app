@@ -32,8 +32,14 @@
                                            ::unknown-kind)
                   () ::unknown-kind))))
 
+#?(:clj (defn file-relative-path [root-file file]
+          (-> (.toURI root-file)
+            (.relativize (.toURI file))
+            (.getPath))))
+
 #?(:clj (extend-type java.io.File
-          hfql/Identifiable (-identify [^File x] (.getName x))
+          hfql/Identifiable (-identify [^File x]
+                              (file-relative-path (clojure.java.io/file ".") x))
           hfql/Suggestable
           (-suggest [o]
             (hfql/pull-spec
