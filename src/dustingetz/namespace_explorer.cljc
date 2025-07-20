@@ -15,8 +15,8 @@
 
 #?(:clj (extend-type clojure.lang.Namespace
           hfql/Identifiable (-identify [ns] (ns-name ns))
-          hfql/Suggestable (-suggest [_] (hfql/pull-spec [ns-name ns-publics doc author meta]))))
+          hfql/Suggestable (-suggest [_] (hfql/pull-spec [ns-name ns-publics2 doc author meta]))))
 
 #?(:clj (extend-type clojure.lang.Var
           hfql/Identifiable (-identify [x] (symbol x))
-          hfql/Suggestable (-suggest [x] (hfql/pull-spec [var-name var-arglists meta]))))
+          hfql/Suggestable (-suggest [x] (hfql/pull-spec [var-name var-arglists doc meta .isMacro .getTag]))))

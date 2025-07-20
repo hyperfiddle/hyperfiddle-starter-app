@@ -18,8 +18,8 @@
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
   (let [sitemap (e/server (merge ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
                             dustingetz.hello/sitemap
-                            #_dustingetz.file-explorer/sitemap
-                            #_dustingetz.namespace-explorer/sitemap))]
+                            dustingetz.file-explorer/sitemap
+                            dustingetz.namespace-explorer/sitemap))]
     (HfqlRoot sitemap index)))
 
 (e/defn InjectAndRunHyperfiddle [ring-request]
