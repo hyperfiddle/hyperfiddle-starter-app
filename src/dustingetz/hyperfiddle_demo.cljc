@@ -25,7 +25,8 @@
 (e/defn InjectAndRunHyperfiddle [ring-request]
   (e/client
     (binding [dom/node js/document.body
-              e/http-request (e/server ring-request)]
+              e/http-request (e/server ring-request)
+              e/*exports* (e/server (e/exports))]
       (dom/div (dom/props {:style {:display "contents"}}) ; mandatory wrapper div https://github.com/hyperfiddle/electric/issues/74
         (Hyperfiddle
           {'explorer Explorer})))))
