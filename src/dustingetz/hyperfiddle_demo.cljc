@@ -1,24 +1,26 @@
 (ns dustingetz.hyperfiddle-demo
   (:require
     dustingetz.file-explorer
+    dustingetz.hello
     dustingetz.namespace-explorer
     [hyperfiddle.electric3 :as e]
     [hyperfiddle.electric-dom3 :as dom]
     [hyperfiddle.entrypoint :refer [Hyperfiddle]]
     [hyperfiddle.navigator4 :refer [HfqlRoot]]))
 
-#?(:clj (def sitemap
-          (merge
-            dustingetz.file-explorer/site-map
-            dustingetz.namespace-explorer/site-map)))
+#?(:clj (def index
+          `[(all-ns)
+            (dustingetz.file-explorer/dir-list ".")
+            (clojure.java.io/file ".")]))
 
 (e/defn Explorer []
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
-  (HfqlRoot sitemap
-    `[(dustingetz.namespace-explorer/clojure-all-ns)
-      (dustingetz.file-explorer/dir-list ".")
-      (clojure.java.io/file ".")]))
+  (let [sitemap (e/server (merge ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
+                            dustingetz.hello/sitemap
+                            #_dustingetz.file-explorer/sitemap
+                            #_dustingetz.namespace-explorer/sitemap))]
+    (HfqlRoot sitemap index)))
 
 (e/defn InjectAndRunHyperfiddle [ring-request]
   (e/client

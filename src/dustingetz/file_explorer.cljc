@@ -51,7 +51,7 @@
                file-modified
                file-size]))))
 
-#?(:clj (def site-map
+#?(:clj (def sitemap
           (hfql/sitemap
             {clojure.java.io/file []
              dir-list (hfql/props [] {::hfql/select (dir-list %)})})))
