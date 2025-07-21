@@ -1,22 +1,21 @@
-(ns dustingetz.namespace-explorer
+(ns ^{:hyperfiddle.electric.impl.lang3/has-edef? true} ; enable server hot reloading
+  dustingetz.namespace-explorer
   (:require [hyperfiddle.hfql0 #?(:clj :as :cljs :as-alias) hfql]))
 
 #?(:clj (defn doc [!x] (-> !x meta :doc)))
 #?(:clj (defn author [!x] (-> !x meta :author)))
-#?(:clj (defn ns-publics2 [ns-sym] (-> ns-sym ns-publics vals)))
-#?(:clj (defn var-name [!var] (-> !var symbol name symbol)))
-#?(:clj (defn var-arglists [!var] (->> !var meta :arglists vec str)))
+#?(:clj (defn ns-publics2 [ns-sym] (vals (ns-publics ns-sym)))) ; collection-record form
+#?(:clj (defn var-arglists [!var] (->> !var meta :arglists seq pr-str)))
 
 #?(:clj (def sitemap
           (hfql/sitemap
-            {all-ns (hfql/props [ns-name doc author] {::hfql/select (ns-publics2 %)})
-             ns-publics2 (hfql/props [var-name] {::hfql/select (resolve %)})
-             resolve []})))
+            {all-ns (hfql/props [ns-name] {::hfql/select (ns-publics2 %)})
+             ns-publics2 [symbol]})))
 
 #?(:clj (extend-type clojure.lang.Namespace
           hfql/Identifiable (-identify [ns] (ns-name ns))
-          hfql/Suggestable (-suggest [_] (hfql/pull-spec [ns-name ns-publics2 doc author meta]))))
+          hfql/Suggestable (-suggest [_] (hfql/pull-spec [ns-name doc author ns-publics2 meta]))))
 
 #?(:clj (extend-type clojure.lang.Var
-          hfql/Identifiable (-identify [x] (symbol x))
-          hfql/Suggestable (-suggest [x] (hfql/pull-spec [var-name var-arglists doc meta .isMacro .getTag]))))
+          hfql/Identifiable (-identify [ns] (symbol ns))
+          hfql/Suggestable (-suggest [_] (hfql/pull-spec [symbol var-arglists doc meta]))))
