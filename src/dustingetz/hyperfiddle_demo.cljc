@@ -10,7 +10,7 @@
 
 #?(:clj (def index
           `[(all-ns)
-            (dustingetz.file-explorer/dir-list ".")
+            (dustingetz.fs2/dir-list ".")
             (clojure.java.io/file ".")]))
 
 (e/defn Explorer []
