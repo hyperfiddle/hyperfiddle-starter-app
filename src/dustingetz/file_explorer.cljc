@@ -6,13 +6,13 @@
             [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]))
 
 #?(:clj (extend-type File
-          hfql/Identifiable (-identify [^File o] (fs/file-path "." o))
+          hfql/Identifiable (-identify [^File o] (fs/jfile-path "." o))
           hfql/Suggestable (-suggest [o]
                              (hfql/pull-spec
                                [.getName
                                 .getAbsolutePath
-                                {fs/file-kind name} ; edge threading
-                                fs/file-modified ; #inst example
+                                {fs/jfile-kind name} ; edge threading
+                                fs/jfile-modified ; #inst example
                                 .listFiles]))))
 
 #?(:clj (def sitemap

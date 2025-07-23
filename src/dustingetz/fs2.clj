@@ -37,14 +37,17 @@
 
 (defn jpath-jattrs [^Path p] (Files/readAttributes p BasicFileAttributes (make-array java.nio.file.LinkOption 0)))
 
-(defn file-jpath "get java.nio.file.Path of j.n.f.File"
+(defn jfile-jpath "get java.nio.file.Path of j.n.f.File"
   [^File f]
   (-> f .getAbsolutePath (java.nio.file.Paths/get (make-array String 0))))
 
-(defn file-jattrs [^File f] (jpath-jattrs (file-jpath f)))
+(defn jfile-jattrs [^File f] (jpath-jattrs (jfile-jpath f)))
+(defn file-jattrs [filepath]
+  (println `file-jattrs (pr-str filepath))
+  (jpath-jattrs (jfile-jpath (check (maybe-file filepath)))))
 
-(defn file-modified [^File x] (let [attrs (file-jattrs x)] (-> attrs .lastModifiedTime .toInstant java.util.Date/from)))
-(defn file-size [^File x] (.size (file-jattrs x)))
+(defn jfile-modified [^File x] (let [attrs (jfile-jattrs x)] (-> attrs .lastModifiedTime .toInstant java.util.Date/from)))
+(defn jfile-size [^File x] (.size (jfile-jattrs x)))
 
 (defn relativize-path "Convert an absolute path to one relative to base-dir"
   [base-dir abs-path]
@@ -65,16 +68,15 @@
   (relativize-path "/fake/" (absolute-path "./src")) := nil
   (relativize-path (absolute-path "./") "/fake/") := nil
   (relativize-path (absolute-path "./") "fake") := nil
-  (relativize-path (absolute-path ".") "src/dustingetz/fs2.clj")
-  (relativize-path (absolute-path ".") (path-parent "src/dustingetz/fs2.cljc")))
+  (relativize-path (absolute-path ".") "src/dustingetz/fs2.clj"))
 
-(defn file-path
+(defn jfile-path
   ([^File f] (-> f .toPath .normalize .toAbsolutePath str))
-  ([base-dir, ^File !file] (relativize-path (absolute-path base-dir) (file-path !file))))
+  ([base-dir, ^File !file] (relativize-path (absolute-path base-dir) (jfile-path !file))))
 
 (comment
-  (file-path (maybe-file (absolute-path "./src"))) := "/Users/dustin/src/hf/monorepo/hyperfiddle-starter-app2/src"
-  (file-path "." (maybe-file (absolute-path *1))) := "src")
+  (jfile-path (maybe-file (absolute-path "./src"))) := "/Users/dustin/src/hf/monorepo/hyperfiddle-starter-app2/src"
+  (jfile-path "." (maybe-file (absolute-path *1))) := "src")
 
 (defn file-extension [?path]
   (when ?path
@@ -96,8 +98,8 @@
   (file-extension ".png") := nil
   (file-extension ".gitignore") := nil)
 
-(defn file-kind [^File x]
-  (let [attrs (file-jattrs x)]
+(defn jfile-kind [^File x]
+  (let [attrs (jfile-jattrs x)]
     (cond (.isDirectory attrs) ::dir
           (.isSymbolicLink attrs) ::symlink
           (.isOther attrs) ::other
@@ -106,7 +108,7 @@
                                    ::unknown-kind)
           () ::unknown-kind)))
 
-(defn file-extension-predicate [ext-set, ^File !file]
+(defn jfile-extension-predicate [ext-set, ^File !file]
   (and (.isFile !file)
     (some? ((set ext-set) (file-extension (.getName !file))))))
 
@@ -116,7 +118,7 @@
     (map #(.getPath %))))
 
 (tests
-  (dir-children "src/dustingetz" (partial file-extension-predicate #{"clj" "cljs" "cljc"}))
+  (dir-children "src/dustingetz" (partial jfile-extension-predicate #{"clj" "cljs" "cljc"}))
   := ["src/dustingetz/fs2.clj"
       "src/dustingetz/hello.cljc"
       "src/dustingetz/hyperfiddle_demo.cljc"
@@ -132,7 +134,7 @@
         (map #(.getPath %))))))
 
 (tests
-  (treeseq-dir-files "src" (partial file-extension-predicate #{"clj"}))
+  (treeseq-dir-files "src" (partial jfile-extension-predicate #{"clj"}))
   := ["src/dustingetz/fs2.clj"]
   (time (count (treeseq-dir-files "src" #{"clj" "cljs" "cljc"})))
   (time (count (distinct (treeseq-dir-files "src" #{"clj" "cljs" "cljc"})))))
@@ -148,13 +150,13 @@
   (treeseq-dir-folders "src") := ["src" "src/dustingetz"])
 
 #_
-        (defn path-parent "slow version"
-          [filepath-str]
-          (when filepath-str
-            (->> (clojure.string/split filepath-str #"/")
-              reverse (drop-while clojure.string/blank?) reverse
-              (butlast) ; first non-blank segment
-              (clojure.string/join "/"))))
+(defn path-parent "slow version"
+  [filepath-str]
+  (when filepath-str
+    (->> (clojure.string/split filepath-str #"/")
+      reverse (drop-while clojure.string/blank?) reverse
+      (butlast) ; first non-blank segment
+      (clojure.string/join "/"))))
 
 ;(defn path-parent "parent is the butlast on the path segments"
 ;  [filepath-str]
