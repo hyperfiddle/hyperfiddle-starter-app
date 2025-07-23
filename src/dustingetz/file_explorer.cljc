@@ -25,10 +25,14 @@
 
 ; 1. Implement Suggestable for a File. Show the file's name and lastModifiedTime using java methods
 ; on the object. The dustingetz.fs2 namespace contains some helper files, play around and add more
-; optional columns. How can we render lastModifiedTime as a date?
+; optional columns. How can we render lastModifiedTime as a date? How can we show the list of files
+; in the folder?
+; Hint: (-suggest [o] (hfql/pull-spec [.getName]))
+; Hint: fs/jfile-modified
+; Hint: .listFiles
 
 ; 2. Make a new route that starts at a folder, showing it's contents, and then navigating from
 ; folder to folder recursively, so that when you select a folder, its children open in the subsequent view.
-; Hint: fs/dir-list
+; Hint: fs/dir-list (can't route to a java method .listFiles yet)
 ; Hint: recursive ::hfql/select target
 ; Hint: (-identify [^File o] (fs/file-path "." o))
