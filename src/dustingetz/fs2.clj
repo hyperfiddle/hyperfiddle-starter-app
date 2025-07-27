@@ -1,4 +1,4 @@
-(ns dustingetz.fs2
+(ns dustingetz.fs2 ; duplicated here until contrib deploy
   (:import [clojure.lang ExceptionInfo]
            [java.io File]
            [java.nio.file Path Paths Files]
