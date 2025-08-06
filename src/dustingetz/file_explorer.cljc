@@ -3,22 +3,23 @@
   #?(:clj (:import [java.io File]))
   (:require #?(:clj clojure.java.io)
             #?(:clj [dustingetz.fs2 :as fs])
-            [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]))
+            #_[hyperfiddle.hfql0 :as hfql #?(:clj :as, :cljs :as-alias) hfql]
+            [hyperfiddle.hfql1 :as hfql :refer [hfql]]))
 
 #?(:clj (extend-type File
           hfql/Identifiable (-identify [^File o] (fs/jfile-path "." o))
           hfql/Suggestable (-suggest [o]
-                             (hfql/pull-spec
+                             (hfql
                                [.getName
                                 .getAbsolutePath
-                                {fs/jfile-kind name} ; edge threading
-                                fs/jfile-modified ; #inst example
+                                ;; {fs/jfile-kind name} ; edge threading
+                                ;; fs/jfile-modified ; #inst example
                                 .listFiles]))))
 
 #?(:clj (def sitemap
-          (hfql/sitemap
+          (hfql
             {clojure.java.io/file [.getName]
-             fs/dir-list (hfql/props [] {::hfql/select (fs/dir-list %)})})))
+             fs/dir-list (hfql [] {::hfql/select '(fs/dir-list %)})})))
 
 
 ; Homework
