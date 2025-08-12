@@ -18,7 +18,7 @@
 #?(:clj (def sitemap
           (hfql
             {clojure.java.io/file [File/.getName]
-             fs/dir-list (hfql [] {::hfql/select '(fs/dir-list %)})})))
+             fs/dir-list (hfql [*] {::hfql/select '(fs/dir-list %)}) })))
 
 
 ; Homework
