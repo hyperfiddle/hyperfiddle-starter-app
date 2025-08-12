@@ -9,15 +9,15 @@
           hfql/Identifiable (-identify [^File o] (fs/jfile-path "." o))
           hfql/Suggestable (-suggest [o]
                              (hfql
-                               [.getName
-                                .getAbsolutePath
+                               [File/.getName
+                                File/.getAbsolutePath
                                 {fs/jfile-kind name} ; edge threading
                                 fs/jfile-modified ; #inst example
-                                .listFiles]))))
+                                File/.listFiles]))))
 
 #?(:clj (def sitemap
           (hfql
-            {clojure.java.io/file [.getName]
+            {clojure.java.io/file [File/.getName]
              fs/dir-list (hfql [] {::hfql/select '(fs/dir-list %)})})))
 
 
