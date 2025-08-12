@@ -3,7 +3,6 @@
   #?(:clj (:import [java.io File]))
   (:require #?(:clj clojure.java.io)
             #?(:clj [dustingetz.fs2 :as fs])
-            #_[hyperfiddle.hfql0 :as hfql #?(:clj :as, :cljs :as-alias) hfql]
             [hyperfiddle.hfql1 :as hfql :refer [hfql]]))
 
 #?(:clj (extend-type File
@@ -12,8 +11,8 @@
                              (hfql
                                [.getName
                                 .getAbsolutePath
-                                ;; {fs/jfile-kind name} ; edge threading
-                                ;; fs/jfile-modified ; #inst example
+                                {fs/jfile-kind name} ; edge threading
+                                fs/jfile-modified ; #inst example
                                 .listFiles]))))
 
 #?(:clj (def sitemap
