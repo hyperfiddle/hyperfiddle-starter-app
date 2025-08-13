@@ -12,7 +12,9 @@
 
 #?(:clj (extend-type clojure.lang.Namespace
           hfql/Identifiable (-identify [ns] `(find-ns ~(ns-name ns)))
-          hfql/Suggestable (-suggest [_] (hfql [ns-name doc author ns-publics2 meta]))))
+          hfql/Suggestable (-suggest [_] (hfql [ns-name doc author
+                                                ^{::hfql/select '(ns-publics2 %)} ns-publics2
+                                                meta]))))
 
 #?(:clj (extend-type clojure.lang.Var
           hfql/Identifiable (-identify [ns] (symbol ns))
