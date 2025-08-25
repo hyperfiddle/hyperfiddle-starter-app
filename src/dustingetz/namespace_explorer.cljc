@@ -7,8 +7,9 @@
 #?(:clj (defn var-arglists [!var] (->> !var meta :arglists seq pr-str)))
 
 #?(:clj (def sitemap
-          (hfql {(all-ns) ^{::hfql/select '(ns-publics2 %)} [ns-name]
-                 ns-publics2 [symbol]})))
+          (hfql {(all-ns) ^{::hfql/select '(ns-publics %)} [ns-name]
+                 ;; ns-publics2 [symbol]
+                 ns-publics {* val}})))
 
 #?(:clj (extend-type clojure.lang.Namespace
           hfql/Identifiable (-identify [ns] `(find-ns ~(ns-name ns)))
