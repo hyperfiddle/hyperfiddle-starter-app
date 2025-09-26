@@ -3,22 +3,30 @@
   #?(:clj (:import [java.io File]))
   (:require #?(:clj clojure.java.io)
             #?(:clj [dustingetz.fs2 :as fs])
-            [hyperfiddle.hfql1 :as hfql :refer [hfql]]))
+            [hyperfiddle.hfql2 :as hfql :refer [hfql]]))
 
 #?(:clj (extend-type File
-          hfql/Identifiable (-identify [^File o] (fs/jfile-path "." o))
+          hfql/Identifiable (-identify [^File o] `(clojure.java.io/file ~(.getPath o)))
           hfql/Suggestable (-suggest [o]
+                             (prn "sugest" o)
                              (hfql
                                [File/.getName
                                 File/.getAbsolutePath
-                                {fs/jfile-kind name} ; edge threading
-                                fs/jfile-modified ; #inst example
-                                File/.listFiles]))))
+                                #_File/.getPath
+                                #_File/.getAbsolutePath
+                                #_{fs/jfile-kind name} ; edge threading
+                                #_fs/jfile-modified ; #inst example
+                                #_{File/.listFiles {* ...}}]))))
 
 #?(:clj (def sitemap
-          (hfql
-            {clojure.java.io/file [File/.getName]
-             fs/dir-list (hfql [*] {::hfql/select '(fs/dir-list %)}) })))
+          (hfql/combine
+            #_(hfql [{clojure.java.io/file [File/.getName]}])
+            (hfql [{clojure.java.io/file [File/.getName #_File/.getAbsolutePath {File/.listFiles {* ...}}]}])
+            #_(hfql {fs/dir-list {* ...} #_{* [*]} #_{* ...}}))))
+
+(comment
+  (hfql/values (hfql/seed {'% "."} (hfql/find-sitemap-entry 'fs/dir-list sitemap)))
+  )
 
 
 ; Homework
