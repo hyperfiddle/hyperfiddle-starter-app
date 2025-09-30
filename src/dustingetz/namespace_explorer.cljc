@@ -15,7 +15,7 @@
 
 #?(:clj (extend-type clojure.lang.Var
           hfql/Identifiable (-identify [ns] `(find-var ~(symbol ns)))
-          hfql/Suggestable (-suggest [_] (hfql [symbol var-arglists doc {meta [:ns *]} .isMacro .isDynamic .getTag]))))
+          hfql/Suggestable (-suggest [_] (hfql [symbol var-arglists doc meta .isMacro .isDynamic .getTag]))))
 
 #?(:clj (defmethod hfql/resolve `find-ns [[_ ns-sym]] (find-ns ns-sym)))
 #?(:clj (defmethod hfql/resolve `find-var [[_ var-sym]] (find-var var-sym)))
