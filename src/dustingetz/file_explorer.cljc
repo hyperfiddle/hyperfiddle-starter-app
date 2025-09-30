@@ -7,27 +7,19 @@
 
 #?(:clj (extend-type File
           hfql/Identifiable (-identify [^File o] `(clojure.java.io/file ~(.getPath o)))
-          hfql/Suggestable (-suggest [o]
-                             (prn "sugest" o)
-                             (hfql
-                               [File/.getName
-                                File/.getAbsolutePath
-                                #_File/.getPath
-                                #_File/.getAbsolutePath
-                                #_{fs/jfile-kind name} ; edge threading
-                                #_fs/jfile-modified ; #inst example
-                                #_{File/.listFiles {* ...}}]))))
+          hfql/Suggestable (-suggest [o] nil
+                             (hfql [File/.getName
+                                    File/.getPath
+                                    File/.getAbsolutePath
+                                    {fs/jfile-kind name} ; edge threading
+                                    fs/jfile-modified ; #inst example
+                                    {File/.listFiles {* ...}}]))))
 
 #?(:clj (def sitemap
-          (hfql/combine
-            #_(hfql [{clojure.java.io/file [File/.getName]}])
-            (hfql [{clojure.java.io/file [File/.getName #_File/.getAbsolutePath {File/.listFiles {* ...}}]}])
-            #_(hfql {fs/dir-list {* ...} #_{* [*]} #_{* ...}}))))
+          {`file     (hfql [File/.getName {File/.listFiles {* ...}}])
+           `dir-list (hfql {File/.listFiles {* [File/.getName ...]}})}))
 
-(comment
-  (hfql/values (hfql/seed {'% "."} (hfql/find-sitemap-entry 'fs/dir-list sitemap)))
-  )
-
+#?(:clj (defmethod hfql/resolve 'clojure.java.io/file [[_ file-path-str]] (clojure.java.io/file file-path-str)))
 
 ; Homework
 
@@ -35,7 +27,7 @@
 ; on the object. The dustingetz.fs2 namespace contains some helper files, play around and add more
 ; optional columns. How can we render lastModifiedTime as a date? How can we show the list of files
 ; in the folder?
-; Hint: (-suggest [o] (hfql/pull-spec [.getName]))
+; Hint: (-suggest [o] (hfql [.getName]))
 ; Hint: fs/jfile-modified
 ; Hint: .listFiles
 

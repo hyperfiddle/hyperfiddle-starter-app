@@ -29,9 +29,9 @@
 (e/defn Explorer []
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
-  (let [sitemap (e/server (hfql/combine ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
+  (let [sitemap (e/server (merge ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
                             #_dustingetz.hello/sitemap
-                            #_dustingetz.namespace-explorer/sitemap
+                            dustingetz.namespace-explorer/sitemap
                             dustingetz.file-explorer/sitemap
                             ))]
     (HfqlRoot (e/server #_(seed (hfqlT [{:a inc} {:b clojure.string/upper-case} '*]) {:a 1, :b "b", :c "c"})
@@ -58,8 +58,13 @@
                         #_(hfql {(range 10) {* [inc dec]}})
                         sitemap)
 
-      '[(clojure.java.io/file ".")
-        (fs/dir-list ".")])))
+      ['(dustingetz.file-explorer/file (clojure.java.io/file "."))
+       '(dustingetz.file-explorer/dir-list (clojure.java.io/file "."))
+       '(clojure.core/all-ns)
+       ;; '(dustingetz.namespace-explorer/ns-publics2)
+       ]
+      
+      )))
 
 (e/defn InjectAndRunHyperfiddle [ring-request]
   (e/client
