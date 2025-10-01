@@ -1,21 +1,20 @@
 (ns dustingetz.hyperfiddle-demo
   (:require
     dustingetz.file-explorer
-    #_dustingetz.hello
+    dustingetz.hello
     dustingetz.namespace-explorer
     [hyperfiddle.electric3 :as e]
     [hyperfiddle.electric-dom3 :as dom]
     [hyperfiddle.entrypoint2 :refer [Hyperfiddle]]
     [hyperfiddle.navigator6 :refer [HfqlRoot]]
-    [hyperfiddle.hfql2 :as hfql :refer [hfql]]
-    #_[hyperfiddle.hfql1.coalgebra :refer [hfqlT seed]])
+    [hyperfiddle.hfql2 :as hfql :refer [hfql]])
   #?(:clj (:import [java.io File])))
 
 #?(:clj (def index
           '[(hello)
-            #_(all-ns)
-            #_(dustingetz.fs2/dir-list ".")
-            #_(clojure.java.io/file ".")]))
+            (all-ns)
+            (dustingetz.fs2/dir-list ".")
+            (clojure.java.io/file ".")]))
 
 (def lorem (clojure.string/join \n 
              ["Aliquam erat volutpat.  Nunc eleifend leo vitae magna.  In id erat non orci commodo lobortis.  Proin neque massa, cursus ut, gravida ut, lobortis eget, lacus.  Sed diam.  Praesent fermentum tempor tellus.  Nullam tempus.  Mauris ac felis vel velit tristique imperdiet.  Donec at pede.  Etiam vel neque nec dui dignissim bibendum.  Vivamus id enim.  Phasellus neque orci, porta a, aliquet quis, semper a, massa.  Phasellus purus.  Pellentesque tristique imperdiet tortor.  Nam euismod tellus id erat."
@@ -30,41 +29,17 @@
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
   (let [sitemap (e/server (merge ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
-                            #_dustingetz.hello/sitemap
+                            dustingetz.hello/sitemap
                             dustingetz.namespace-explorer/sitemap
                             dustingetz.file-explorer/sitemap
-                            ))]
-    (HfqlRoot (e/server #_(seed (hfqlT [{:a inc} {:b clojure.string/upper-case} '*]) {:a 1, :b "b", :c "c"})
-                        #_(seed (hfqlT {'* [{:a inc} {:b clojure.string/upper-case} '*]}) [{:a 1, :b "hello", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "world"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}
-                                                                                                    {:a 1, :b "b", :c "c"}                                                                                                   {:a 1, :b "b", :c "c"}
-                                                                                                    ])
-                        #_(seed (hfqlT {split-sentences {'* [identity word-count]}}) lorem)
-                        #_(hfql {* [:name :file]}) (map meta (vals (ns-publics 'clojure.core)))
-                        #_(hfql {(range 10) {* [inc dec]}})
-                        sitemap)
+                            {'lorem (hfql {(split-sentences ^:symbolic lorem) {* [identity word-count]}})}))]
+    (HfqlRoot (e/server sitemap)
 
       ['(dustingetz.file-explorer/file (clojure.java.io/file "."))
        '(dustingetz.file-explorer/dir-list (clojure.java.io/file "."))
        '(clojure.core/all-ns)
-       ;; '(dustingetz.namespace-explorer/ns-publics2)
-       ]
-      
-      )))
+       'lorem
+       'dustingetz.hello])))
 
 (e/defn InjectAndRunHyperfiddle [ring-request]
   (e/client

@@ -1,6 +1,4 @@
 (ns dustingetz.hello
-  (:require [hyperfiddle.hfql0 #?(:clj :as :cljs :as-alias) hfql]))
+  (:require [hyperfiddle.hfql2 :as hfql]))
 
-#?(:clj (def sitemap
-          (hfql/sitemap
-            {})))
+#?(:clj (def sitemap {'dustingetz.hello (hfql/hfql (find-ns 'dustingetz.hello))}))
