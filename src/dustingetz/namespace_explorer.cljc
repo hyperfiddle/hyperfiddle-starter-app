@@ -11,7 +11,9 @@
 
 #?(:clj (extend-type clojure.lang.Namespace
           hfql/Identifiable (-identify [ns] `(find-ns ~(ns-name ns)))
-          hfql/Suggestable (-suggest [_] (hfql [ns-name doc author ns-publics meta]))))
+          hfql/Suggestable (-suggest [_] (hfql [ns-name doc author
+                                                ns-publics ; TODO leverage ::hf/select to `ns-publics
+                                                meta]))))
 
 #?(:clj (extend-type clojure.lang.Var
           hfql/Identifiable (-identify [ns] `(find-var ~(symbol ns)))
@@ -19,4 +21,3 @@
 
 #?(:clj (defmethod hfql/resolve `find-ns [[_ ns-sym]] (find-ns ns-sym)))
 #?(:clj (defmethod hfql/resolve `find-var [[_ var-sym]] (find-var var-sym)))
-
