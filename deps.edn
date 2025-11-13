@@ -1,4 +1,4 @@
-{:deps    {com.hyperfiddle/hyperfiddle {:mvn/version "v0-alpha-SNAPSHOT"}
+{:deps    {com.hyperfiddle/hyperfiddle {:mvn/version "v0-alpha-00120400"}
            ;; ring/ring {:mvn/version "1.14.1"} ; jetty 12, works but message payload size tunning API has changed, we need to upgrade it.
            ring/ring {:mvn/version "1.11.0"} ; to serve the app
            ch.qos.logback/logback-classic {:mvn/version "1.4.14"}
@@ -8,9 +8,10 @@
                  :extra-deps {thheller/shadow-cljs {:mvn/version "2.26.2"}
                               ch.qos.logback/logback-classic {:mvn/version "1.4.14"}
                               }
-                 :override-deps {com.hyperfiddle/hyperfiddle {:local/root "../hyperfiddle"}}}
+                 }
            :prod {:extra-paths ["src-prod"]
                   :extra-deps {ch.qos.logback/logback-classic {:mvn/version "1.4.14"}}}
+           :private {:override-deps {com.hyperfiddle/hyperfiddle {:local/root "../hyperfiddle"}}}
            :build ; use `clj -X:prod:build build-client`, NOT -T!
            {:extra-paths ["src-build"]
             :ns-default  build
