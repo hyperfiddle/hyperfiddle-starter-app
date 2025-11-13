@@ -5,6 +5,7 @@
     [hyperfiddle.electric3 :as e]
     [hyperfiddle.electric-dom3 :as dom]
     [hyperfiddle.entrypoint2 :refer [Hyperfiddle]]
+    [hyperfiddle.electric-forms5 :refer [Checkbox*]]
     [hyperfiddle.navigator6 :refer [HfqlRoot]]))
 
 #?(:clj (def index
@@ -15,6 +16,7 @@
 (e/defn Explorer []
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
+  (Checkbox* false {:class "data-loader__enabled" :style {:position :absolute, :inset-block-start "1dvw", :inset-inline-end "1dvw"}})
   (let [sitemap (e/server (merge ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
                             dustingetz.namespace-explorer/sitemap
                             dustingetz.file-explorer/sitemap))]
