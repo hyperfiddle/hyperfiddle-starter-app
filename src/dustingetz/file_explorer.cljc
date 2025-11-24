@@ -1,5 +1,4 @@
-(ns ^{:hyperfiddle.electric.impl.lang3/has-edef? true} ; enable server hot reloading
-  dustingetz.file-explorer
+(ns dustingetz.file-explorer
   #?(:clj (:import [java.io File]))
   (:require #?(:clj clojure.java.io)
             #?(:clj [dustingetz.fs2 :as fs])
