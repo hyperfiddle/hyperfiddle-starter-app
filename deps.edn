@@ -1,4 +1,5 @@
-{:deps    {com.hyperfiddle/hyperfiddle {:mvn/version "v0-alpha-00120400"}
+{:deps    {org.clojure/clojure {:mvn/version "1.12.3"}
+           com.hyperfiddle/hyperfiddle {:mvn/version "v0-alpha-86cef0fb"}
            ;; ring/ring {:mvn/version "1.14.1"} ; jetty 12, works but message payload size tunning API has changed, we need to upgrade it.
            ring/ring {:mvn/version "1.11.0"} ; to serve the app
            ch.qos.logback/logback-classic {:mvn/version "1.4.14"}
