@@ -1,51 +1,39 @@
 (ns dustingetz.file-explorer
-  #?(:clj (:import [java.nio.file Path Paths Files]
-                   [java.nio.file.attribute BasicFileAttributes FileTime]
-                   [java.io File]))
-  (:require
-    #?(:clj clojure.java.io)
-    [hyperfiddle.hfql0 #?(:clj :as, :cljs :as-alias) hfql]))
+  #?(:clj (:import [java.io File]))
+  (:require #?(:clj clojure.java.io)
+            #?(:clj [dustingetz.fs2 :as fs])
+            [hyperfiddle.hfql2 :as hfql :refer [hfql]]
+            [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]
+            ))
 
-#?(:clj (defn file-order-compare [^File x] [(not (.isDirectory x)) (.getName x)]))
-#?(:clj (defn dir-list [^String file-path] (.listFiles (clojure.java.io/file file-path))))
-#?(:clj (defn path-attrs [^Path p] (Files/readAttributes p BasicFileAttributes (make-array java.nio.file.LinkOption 0))))
-#?(:clj (defn file-path "get java.nio.file.Path of j.n.f.File" [^java.io.File f]
-          (-> f .getAbsolutePath (java.nio.file.Paths/get (make-array String 0)))))
-#?(:clj (defn file-attrs [^File f] (path-attrs (file-path f))))
-;#?(:clj (defn dir-parent [^File x] (some-> x file-path .getParent .toFile)))
-#?(:clj (defn file-modified [^File x] (let [attrs (file-attrs x)] (-> attrs .lastModifiedTime .toInstant java.util.Date/from))))
-#?(:clj (defn file-size [^File x] (.size (file-attrs x))))
+#?(:clj (extend-type File
+          Identifiable (identify [^File o] `(clojure.java.io/file ~(.getPath o)))
+          Suggestable (suggest [o] nil
+                        (hfql [File/.getName
+                               File/.getPath
+                               File/.getAbsolutePath
+                               {fs/jfile-kind name} ; edge threading
+                               fs/jfile-modified ; #inst example
+                               {File/.listFiles {* ...}}]))))
 
-(defn get-extension [?path]
-  (when ?path
-    (when-not (= \. (first ?path)) ; hidden
-      (some-> (last (re-find #"(\.[a-zA-Z0-9]+)$" ?path))
-              (subs 1)))))
+#?(:clj (def sitemap
+          {`file     (hfql [File/.getName {File/.listFiles {* ...}}])
+           `dir-list (hfql {File/.listFiles {* [File/.getName ...]}})}))
 
-#?(:clj (defn file-kind [^File x]
-          (let [attrs (file-attrs x)]
-            (cond (.isDirectory attrs) ::dir
-                  (.isSymbolicLink attrs) ::symlink
-                  (.isOther attrs) ::other
-                  (.isRegularFile attrs) (if-let [s (get-extension (.getName x))]
-                                           (keyword (namespace ::foo) s)
-                                           ::unknown-kind)
-                  () ::unknown-kind))))
+#?(:clj (defmethod hfql-resolve 'clojure.java.io/file [[_ file-path-str]] (clojure.java.io/file file-path-str)))
 
-#?(:clj (extend-type java.io.File
-          hfql/Identifiable (-identify [^File x] (.getName x))
-          hfql/Suggestable
-          (-suggest [o]
-            (hfql/pull-spec
-              [.getName
-               .getAbsolutePath
-               .lastModified
-               .listFiles
-               {file-kind name}
-               file-modified
-               file-size]))))
+; Homework
 
-#?(:clj (def site-map
-          (hfql/sitemap
-            {clojure.java.io/file []
-             dir-list (hfql/props [] {::hfql/select (dir-list %)})})))
+; 1. Implement Suggestable for a File. Show the file's name and lastModifiedTime using java methods
+; on the object. The dustingetz.fs2 namespace contains some helper files, play around and add more
+; optional columns. How can we render lastModifiedTime as a date? How can we show the list of files
+; in the folder?
+; Hint: (-suggest [o] (hfql [.getName]))
+; Hint: fs/jfile-modified
+; Hint: .listFiles
+
+; 2. Make a new route that starts at a folder, showing it's contents, and then navigating from
+; folder to folder recursively, so that when you select a folder, its children open in the subsequent view.
+; Hint: fs/dir-list (can't route to a java method .listFiles yet)
+; Hint: recursive ::hfql/select target
+; Hint: (-identify [^File o] (fs/file-path "." o))
