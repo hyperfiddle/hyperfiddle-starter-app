@@ -1,4 +1,4 @@
-(ns dustingetz.namespace-explorer
+(ns dustingetz.nav-clj-ns
   (:require
    [hyperfiddle.hfql2 :as hfql :refer [hfql]]
    [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]))

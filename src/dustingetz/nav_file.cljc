@@ -1,4 +1,4 @@
-(ns dustingetz.file-explorer
+(ns dustingetz.nav-file
   #?(:clj (:import
            [java.io File]
            [java.nio.file Path Paths Files LinkOption]
