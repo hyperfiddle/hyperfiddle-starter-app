@@ -1,6 +1,7 @@
 (ns dustingetz.namespace-explorer
-  (:require [hyperfiddle.hfql2 :as hfql :refer [hfql]]
-            [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]))
+  (:require
+   [hyperfiddle.hfql2 :as hfql :refer [hfql]]
+   [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]))
 
 #?(:clj (defn doc [!x] (-> !x meta :doc)))
 #?(:clj (defn author [!x] (-> !x meta :author)))
