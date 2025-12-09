@@ -6,7 +6,7 @@
   (:require
    #?(:clj [clojure.java.io :refer [file]])
    [hyperfiddle.hfql2 :as hfql :refer [hfql]]
-   [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]))
+   [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable -hfql-resolve]]))
 
 #?(:clj (defn jpath-jattrs [^Path !p] (Files/readAttributes !p BasicFileAttributes (make-array LinkOption 0))))
 #?(:clj (defn jfile-jpath [^File !f] (-> !f .getAbsolutePath (Paths/get (make-array String 0)))))
@@ -30,8 +30,8 @@
               () ::unknown-kind))))
 
 #?(:clj (extend-type File
-          Identifiable (identify [^File !f] `(file ~(.getPath !f)))
-          Suggestable (suggest [^File !f]
+          Identifiable (-identify [^File !f] `(file ~(.getPath !f)))
+          Suggestable (-suggest [^File !f]
                         (hfql [.getName
                                .getPath
                                .getAbsolutePath
@@ -43,4 +43,4 @@
 #?(:clj (def sitemap
           {'file (hfql [.getName {.listFiles {* ...}}])}))
 
-#?(:clj (defmethod hfql-resolve `file [[_ file-path-str]] (file file-path-str)))
+#?(:clj (defmethod -hfql-resolve `file [[_ file-path-str]] (file file-path-str)))
