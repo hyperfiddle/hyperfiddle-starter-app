@@ -10,8 +10,7 @@
 
 #?(:clj (def index
           ['clojure.core/all-ns
-           '(dustingetz.file-explorer/dir-list (clojure.java.io/file "."))
-           '(dustingetz.file-explorer/file (clojure.java.io/file "."))]))
+           '(file (clojure.java.io/file "."))]))
 
 (e/defn Explorer []
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))

@@ -1,39 +1,46 @@
 (ns dustingetz.file-explorer
-  #?(:clj (:import [java.io File]))
-  (:require #?(:clj clojure.java.io)
-            #?(:clj [dustingetz.fs2 :as fs])
-            [hyperfiddle.hfql2 :as hfql :refer [hfql]]
-            [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]
-            ))
+  #?(:clj (:import
+           [java.io File]
+           [java.nio.file Path Paths Files LinkOption]
+           [java.nio.file.attribute BasicFileAttributes]))
+  (:require
+   #?(:clj [clojure.java.io :refer [file]])
+   [hyperfiddle.hfql2 :as hfql :refer [hfql]]
+   [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable hfql-resolve]]))
+
+#?(:clj (defn jpath-jattrs [^Path !p] (Files/readAttributes !p BasicFileAttributes (make-array LinkOption 0))))
+#?(:clj (defn jfile-jpath [^File !f] (-> !f .getAbsolutePath (Paths/get (make-array String 0)))))
+#?(:clj (defn jfile-jattrs [^File !f] (jpath-jattrs (jfile-jpath !f))))
+#?(:clj (defn jfile-modified [^File !f] (let [attrs (jfile-jattrs !f)] (-> attrs .lastModifiedTime .toInstant java.util.Date/from))))
+
+#?(:clj (defn jfile-extension [^File !f]
+          (when-let [?path (.getPath !f)]
+            (when-not (= \. (first ?path)) ; hidden
+              (some-> (last (re-find #"(\.[a-zA-Z0-9]+)$" ?path))
+                (subs 1))))))
+
+#?(:clj (defn jfile-kind [^File !f]
+          (let [attrs (jfile-jattrs !f)]
+            (cond (.isDirectory attrs) ::dir
+              (.isSymbolicLink attrs) ::symlink
+              (.isOther attrs) ::other
+              (.isRegularFile attrs) (if-let [s (jfile-extension (.getName !f))]
+                                       (keyword (namespace ::foo) s)
+                                       ::unknown-kind)
+              () ::unknown-kind))))
 
 #?(:clj (extend-type File
-          Identifiable (identify [^File o] `(clojure.java.io/file ~(.getPath o)))
-          Suggestable (suggest [o] nil
-                        (hfql [File/.getName
-                               File/.getPath
-                               File/.getAbsolutePath
-                               {fs/jfile-kind name} ; edge threading
-                               fs/jfile-modified ; #inst example
-                               {File/.listFiles {* ...}}]))))
+          Identifiable (identify [^File !f] `(file ~(.getPath !f)))
+          Suggestable (suggest [^File !f]
+                        (hfql [.getName
+                               .getPath
+                               .getAbsolutePath
+                               {jfile-jattrs [.isRegularFile .isDirectory .isSymbolicLink .isOther]}
+                               {jfile-kind name} ; edge threading
+                               jfile-modified ; #inst example
+                               {.listFiles {* ...}}]))))
 
 #?(:clj (def sitemap
-          {`file     (hfql [File/.getName {File/.listFiles {* ...}}])
-           `dir-list (hfql {File/.listFiles {* [File/.getName ...]}})}))
+          {'file (hfql [.getName {.listFiles {* ...}}])}))
 
-#?(:clj (defmethod hfql-resolve 'clojure.java.io/file [[_ file-path-str]] (clojure.java.io/file file-path-str)))
-
-; Homework
-
-; 1. Implement Suggestable for a File. Show the file's name and lastModifiedTime using java methods
-; on the object. The dustingetz.fs2 namespace contains some helper files, play around and add more
-; optional columns. How can we render lastModifiedTime as a date? How can we show the list of files
-; in the folder?
-; Hint: (-suggest [o] (hfql [.getName]))
-; Hint: fs/jfile-modified
-; Hint: .listFiles
-
-; 2. Make a new route that starts at a folder, showing it's contents, and then navigating from
-; folder to folder recursively, so that when you select a folder, its children open in the subsequent view.
-; Hint: fs/dir-list (can't route to a java method .listFiles yet)
-; Hint: recursive ::hfql/select target
-; Hint: (-identify [^File o] (fs/file-path "." o))
+#?(:clj (defmethod hfql-resolve `file [[_ file-path-str]] (file file-path-str)))
