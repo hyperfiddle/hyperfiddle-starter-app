@@ -1,25 +1,24 @@
 (ns dustingetz.hyperfiddle-demo
   (:require
-    dustingetz.file-explorer
-    dustingetz.namespace-explorer
-    [hyperfiddle.electric3 :as e]
-    [hyperfiddle.electric-dom3 :as dom]
-    [hyperfiddle.entrypoint2 :refer [Hyperfiddle]]
-    [hyperfiddle.electric-forms5 :refer [Checkbox*]]
-    [hyperfiddle.navigator6 :refer [HfqlRoot]]))
+   dustingetz.nav-file
+   dustingetz.nav-clj-ns
+   [hyperfiddle.electric3 :as e]
+   [hyperfiddle.electric-dom3 :as dom]
+   [hyperfiddle.entrypoint2 :refer [Hyperfiddle]]
+   [hyperfiddle.electric-forms5 :refer [Checkbox*]]
+   [hyperfiddle.navigator6 :refer [HfqlRoot]]))
 
 #?(:clj (def index
           ['clojure.core/all-ns
-           '(dustingetz.file-explorer/dir-list (clojure.java.io/file "."))
-           '(dustingetz.file-explorer/file (clojure.java.io/file "."))]))
+           '(file (clojure.java.io/file "."))]))
 
 (e/defn Explorer []
   (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/electric-forms.css"}))
-  (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser.css"})) ; TODO remove
+  (dom/link (dom/props {:rel :stylesheet :href "/hyperfiddle/datomic-browser2.css"})) ; TODO remove
   (Checkbox* false {:class "data-loader__enabled" :style {:position :absolute, :inset-block-start "1dvw", :inset-inline-end "1dvw"}})
   (let [sitemap (e/server (merge ; don't externalize to a global clojure def, it will sever hot reload on sitemap change
-                            dustingetz.namespace-explorer/sitemap
-                            dustingetz.file-explorer/sitemap))]
+                            dustingetz.nav-clj-ns/sitemap
+                            dustingetz.nav-file/sitemap))]
     (HfqlRoot (e/server sitemap) index)))
 
 (e/defn InjectAndRunHyperfiddle [ring-request]
