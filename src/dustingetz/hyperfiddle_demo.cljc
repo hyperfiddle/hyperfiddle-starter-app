@@ -1,7 +1,7 @@
 (ns dustingetz.hyperfiddle-demo
   (:require
-   dustingetz.nav-file
-   dustingetz.nav-clj-ns
+   #?(:clj dustingetz.nav-file)
+   #?(:clj dustingetz.nav-clj-ns)
    [hyperfiddle.electric3 :as e]
    [hyperfiddle.electric-dom3 :as dom]
    [hyperfiddle.entrypoint2 :refer [Hyperfiddle]]
