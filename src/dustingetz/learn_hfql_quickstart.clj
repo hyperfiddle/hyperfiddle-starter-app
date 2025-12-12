@@ -1,11 +1,10 @@
 (ns dustingetz.learn-hfql-quickstart
   (:require
    [hyperfiddle.hfql2 :as hfql :refer [hfql]]
-   [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable]]
-   [hyperfiddle.rcf :refer [tests]]))
+   [hyperfiddle.hfql2.protocols :refer [Identifiable Suggestable]]))
 
 (set! clojure.core/*print-namespace-maps* false) ; better REPL print indentation
-(hyperfiddle.rcf/enable!)
+(defmacro tests [& body])
 
 ; HFQL is generalized Datomic pull over any object
 ; Let's start with a file
@@ -56,55 +55,56 @@
   )
 
 (tests
- "HFQL cardinality many"
- (def xs (take 3 (all-ns)))
- (def q (hfql {* [type]} xs)) ; * means foreach
- (hfql/pull q)
- := [{'type clojure.lang.Namespace}
-     {'type clojure.lang.Namespace}
-     {'type clojure.lang.Namespace}]
+  "HFQL cardinality many"
+  (def xs (take 3 (all-ns)))
+  (def q (hfql {* [type]} xs)) ; * means foreach
+  (hfql/pull q)
+  := [{'type clojure.lang.Namespace}
+      {'type clojure.lang.Namespace}
+      {'type clojure.lang.Namespace}]
 
  ; in Datomic pull, the * is implicit from the cardinality of the schema attribute
  ; Arbitrary objects do not have schema, so the programmer must inject that information
 
  ; We can also query the seq object, which is typically not what you want but
  ; it is well defined. Note here we pull `count ` an aggregating fn.
- (def q (hfql [type count] xs)) ; no *, so we see the collection, not each element
- (hfql/pull q)
- := {'type clojure.lang.LazySeq, 'count 3})
+  (def q (hfql [type count] xs)) ; no *, so we see the collection, not each element
+  (hfql/pull q)
+  := {'type clojure.lang.LazySeq, 'count 3})
 
 
 ; Ok lets query some progressively more interesting objects
 
 (tests
- "HFQL over clojure.deps"
- (require '[clojure.tools.deps :as deps])
- (def x (deps/slurp-deps (clojure.java.io/file "deps.edn"))) ; a deep EDN document
- (hfql/pull (hfql [{:aliases [count keys]}] x))
- := {:deps
-     {'count 10,
-      'keys
-      '[org.clojure/clojure
-        org.clojure/tools.logging
-        com.hyperfiddle/electric
-        ring-basic-authentication/ring-basic-authentication
-        org.clojure/clojurescript
-        com.hyperfiddle/hyperfiddle-contrib
-        com.hyperfiddle/rcf
-        com.hyperfiddle/hyperfiddle
-        ch.qos.logback/logback-classic
-        ring/ring-core]}})
+  "HFQL over clojure.deps"
+  (require '[clojure.repl.deps :refer [add-lib]])
+  (add-lib 'org.clojure/tools.deps)
+  (def x (deps/slurp-deps (clojure.java.io/file "deps.edn"))) ; a deep EDN document
+  (hfql/pull (hfql [{:aliases [count keys]}] x))
+  := {:deps
+      {'count 10,
+       'keys
+       '[org.clojure/clojure
+         org.clojure/tools.logging
+         com.hyperfiddle/electric
+         ring-basic-authentication/ring-basic-authentication
+         org.clojure/clojurescript
+         com.hyperfiddle/hyperfiddle-contrib
+         com.hyperfiddle/rcf
+         com.hyperfiddle/hyperfiddle
+         ch.qos.logback/logback-classic
+         ring/ring-core]}})
 
 (tests
- "HFQL over Java"
- (import '[java.lang.management ManagementFactory])
- (def os (ManagementFactory/getOperatingSystemMXBean))
- (hfql/pull (hfql [.getArch .getAvailableProcessors .getCpuLoad .getSystemCpuLoad type] os))
- := {'.getArch "aarch64",
-     '.getAvailableProcessors 20,
-     '.getCpuLoad _,
-     '.getSystemCpuLoad _,
-     'type com.sun.management.internal.OperatingSystemImpl})
+  "HFQL over Java"
+  (import '[java.lang.management ManagementFactory])
+  (def os (ManagementFactory/getOperatingSystemMXBean))
+  (hfql/pull (hfql [.getArch .getAvailableProcessors .getCpuLoad .getSystemCpuLoad type] os))
+  := {'.getArch "aarch64",
+      '.getAvailableProcessors 20,
+      '.getCpuLoad _,
+      '.getSystemCpuLoad _,
+      'type com.sun.management.internal.OperatingSystemImpl})
 
 (comment
   "HFQL over AWS"
@@ -139,7 +139,7 @@
   (hfql/pull (hfql {* [.getName {.entries {* .getName}} ]} xs))
   )
 
-(tests
+(comment
   "HFQL big complicated nested pull"
   ; More complicated object, this one is a collection represented as an indexed map
   (def xs (ns-publics (find-ns 'clojure.core))) ; returns a REPL-friendly indexed map, not a list
@@ -148,7 +148,7 @@
 
   ; bigger still
   (def xs (->> (all-ns) (filter #(clojure.string/starts-with? (ns-name %) "clojure"))))
-  (count xs) := 120
+  (count xs) := 120 ; depends on your classpath
   (defn var-arglists [!var] (->> !var meta :arglists seq pr-str))
   (def q (hfql {* [ns-name
                    {meta [:doc]}
