@@ -79,6 +79,7 @@
   "HFQL over clojure.deps"
   (require '[clojure.repl.deps :refer [add-lib]])
   (add-lib 'org.clojure/tools.deps)
+  (require '[clojure.tools.deps :as deps])
   (def x (deps/slurp-deps (clojure.java.io/file "deps.edn"))) ; a deep EDN document
   (hfql/pull (hfql [{:aliases [count keys]}] x))
   := {:deps
