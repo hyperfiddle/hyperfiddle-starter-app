@@ -24,7 +24,7 @@
     (cond (.isDirectory attrs) ::dir
       (.isSymbolicLink attrs) ::symlink
       (.isOther attrs) ::other
-      (.isRegularFile attrs) (if-let [s (jfile-extension (.getName !f))]
+      (.isRegularFile attrs) (if-let [s (jfile-extension !f)]
                                (keyword (namespace ::foo) s)
                                ::unknown-kind)
       () ::unknown-kind)))

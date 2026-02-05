@@ -13,8 +13,9 @@
    #?(:clj [ring.middleware.content-type :refer [wrap-content-type]])
    #?(:clj [hyperfiddle.electric-ring-adapter3 :refer [wrap-electric-websocket]]) ; jetty 10+
    ;; #?(:clj [hyperfiddle.electric-jetty9-ring-adapter3 :refer [electric-jetty9-ws-install]]) ; jetty9
-   [clojure.spec.alpha]
-   ))
+   [clojure.spec.alpha])
+  (:import [missionary Cancelled]))
+
 
 (comment (-main)) ; repl entrypoint
 
@@ -57,7 +58,7 @@
      (set! browser-process
        ((hyperfiddle-demo-boot nil) ; boot client-side Electric process
         #(js/console.log "Reactor success:" %)
-        #(js/console.error "Reactor failure:" %)))))
+        #(when-not (instance? Cancelled %) (js/console.error "Reactor failure:" %))))))
 
 #?(:cljs
    (defn ^:dev/before-load stop! [] ; for hot code reload at dev time
