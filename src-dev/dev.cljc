@@ -21,7 +21,6 @@
    (defn -main [& args]
      (let [{:keys [http-port]} (first args)
            http-port (or http-port (next-available-port-from 8080))]
-       (clojure.spec.alpha/check-asserts true)
 
        (shadow-cljs-compiler-server/start!)
        (shadow-cljs-compiler/watch :dev)
@@ -40,7 +39,7 @@
                     :ws-idle-timeout (* 60 1000)          ; 60 seconds in milliseconds
                     :ws-max-binary-size (* 100 1024 1024) ; 100MB - for demo
                     :ws-max-text-size (* 100 1024 1024)}))  ; 100M - for demo.
-     (log/info "👉 http://0.0.0.0:8080"))))
+     (log/info (format "👉 http://0.0.0.0:%s" http-port)))))
 
 (declare browser-process)
 #?(:cljs ; client entrypoint

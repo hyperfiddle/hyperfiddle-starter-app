@@ -11,7 +11,7 @@ git clone git@gitlab.com:hyperfiddle/hyperfiddle-starter-app.git
 cd hyperfiddle-starter-app
 ```
 
-* Shell: `clj -A:dev -X dev/-main`. 
+* Shell: `clj -X:dev dev/-main`.
 * Login instructions will be printed
 * REPL: `:dev` deps alias, `(dev/-main)` at the REPL to start dev build
 * App will start on http://localhost:8080

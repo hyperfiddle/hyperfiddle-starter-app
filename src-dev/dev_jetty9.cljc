@@ -14,24 +14,27 @@
 
 (comment (-main)) ; repl entrypoint
 
+#?(:clj (defn next-available-port-from [start] (first (filter #(try (doto (java.net.ServerSocket. %) .close) % (catch Exception _ (println (format "Port %s already taken" %)) nil)) (iterate inc start)))))
+
 #?(:clj ; server entrypoint
    (defn -main [& args]
-     (log/info "Starting Electric compiler and server...")
+     (let [{:keys [http-port]} (first args)
+           http-port (or http-port (next-available-port-from 8080))]
 
-     (shadow-cljs-compiler-server/start!)
-     (shadow-cljs-compiler/watch :dev)
+       (shadow-cljs-compiler-server/start!)
+       (shadow-cljs-compiler/watch :dev)
 
-     (def server (ring/run-jetty
-                   (-> ; ring middlewares – applied bottom up:
-                     (fn [ring-request] ; 3. index page fallback
-                         (-> (ring-response/resource-response "index.dev.html" {:root "public/hyperfiddle-starter-app"})
-                           (ring-response/content-type "text/html")))
-                     (wrap-resource "public") ; 2. serve assets from disk.
-                     (wrap-content-type)) ; 1. boilerplate – to server assets with correct mime/type.
-                   {:host "0.0.0.0", :port 8080, :join? false
-                    :configurator (fn [server] ; tune jetty
-                                    (electric-jetty9-ws-install server "/" (fn [ring-request] (hyperfiddle-demo-boot ring-request))))}))
-     (log/info "👉 http://0.0.0.0:8080")))
+       (def server (ring/run-jetty
+                     (-> ; ring middlewares – applied bottom up:
+                       (fn [ring-request] ; 3. index page fallback
+                           (-> (ring-response/resource-response "index.dev.html" {:root "public/hyperfiddle-starter-app"})
+                             (ring-response/content-type "text/html")))
+                       (wrap-resource "public") ; 2. serve assets from disk.
+                       (wrap-content-type)) ; 1. boilerplate – to server assets with correct mime/type.
+                     {:host "0.0.0.0", :port http-port, :join? false
+                      :configurator (fn [server] ; tune jetty
+                                      (electric-jetty9-ws-install server "/" (fn [ring-request] (hyperfiddle-demo-boot ring-request))))}))
+       (log/info (format "👉 http://0.0.0.0:%s" http-port)))))
 
 (declare browser-process)
 #?(:cljs ; client entrypoint
