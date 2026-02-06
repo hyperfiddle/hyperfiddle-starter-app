@@ -6,6 +6,10 @@
 
 ## Getting started - dev setup
 
+Prerequisites
+* `java -version` modern version, we use `openjdk version "23.0.2"`
+* Clojure CLI https://clojure.org/guides/install_clojure
+
 ```shell
 git clone git@gitlab.com:hyperfiddle/hyperfiddle-starter-app.git
 cd hyperfiddle-starter-app

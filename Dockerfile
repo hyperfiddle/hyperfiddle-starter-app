@@ -1,4 +1,4 @@
-FROM clojure:temurin-11-tools-deps-1.12.0.1501 AS build
+FROM clojure:temurin-17-tools-deps-1.12.0.1501 AS build
 WORKDIR /app
 COPY deps.edn deps.edn
 ARG VERSION
@@ -14,8 +14,8 @@ COPY resources resources
 
 RUN clojure -X:prod:build uberjar :version "\"$VERSION\"" :build/jar-name "app.jar"
 
-FROM amazoncorretto:11 AS app
-# FROM clojure:temurin-11-tools-deps-1.12.0.1501 AS app
+FROM amazoncorretto:17 AS app
+# FROM clojure:temurin-17-tools-deps-1.12.0.1501 AS app
 WORKDIR /app
 COPY --from=build /app/target/app.jar app.jar
 RUN echo -e "/state/\n/vendor/" > .gitignore
