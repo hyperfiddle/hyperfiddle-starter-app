@@ -9,7 +9,7 @@
    #?(:clj [ring.middleware.resource :refer [wrap-resource]])
    #?(:clj [ring.middleware.content-type :refer [wrap-content-type]])
    #?(:clj [ring.middleware.params :refer [wrap-params]])
-   #?(:clj [hyperfiddle.electric-jetty9-ring-adapter3 :as electric-jetty9]) ; jetty 9
+   #?(:clj [hyperfiddle.electric-jetty9-ring-adapter3 :as electric-jetty9])
    #?(:cljs [hyperfiddle.electric-client3 :as electric-client])
 
    #?(:clj clojure.edn)
