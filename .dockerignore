@@ -1,4 +1,2 @@
-resources/public/hyperfiddle-starter-app/js
 target/
 .cpcache
-.shadow-cljs

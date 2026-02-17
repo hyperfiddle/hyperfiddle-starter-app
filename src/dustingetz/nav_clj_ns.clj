@@ -8,8 +8,7 @@
 (defn var-arglists [!var] (->> !var meta :arglists seq pr-str))
 
 (def sitemap
-  {`all-ns (hfql {(all-ns) {* ^{::hfql/select `ns-publics} [ns-name]}})
-   `ns-publics (hfql {ns-publics {vals {* [symbol]}}})})
+  {`all-ns (hfql {(all-ns) {* [ns-name {ns-publics {vals {* [symbol]}}}]}})})
 
 (extend-type clojure.lang.Namespace
   Identifiable (-identify [ns] `(find-ns ~(ns-name ns)))
@@ -19,7 +18,7 @@
 
 (extend-type clojure.lang.Var
   Identifiable (-identify [ns] `(find-var ~(symbol ns)))
-  Suggestable (-suggest [_] (hfql [symbol var-arglists doc meta .isMacro .isDynamic .getTag])))
+  Suggestable (-suggest [_] (hfql [symbol var-arglists doc meta deref #_.isMacro #_.isDynamic #_.getTag])))
 
 (defmethod -hfql-resolve `find-ns [[_ ns-sym]] (find-ns ns-sym))
 (defmethod -hfql-resolve `find-var [[_ var-sym]] (find-var var-sym))
